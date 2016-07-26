@@ -18,6 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Create News', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
+
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -26,13 +28,26 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'title',
-            'text:ntext',
-            'status',
-            'created_at',
-            // 'updated_at',
+            'text:html',
+            [
+                'attribute' => 'status',
+                'value' =>function($status){
+                    if($status['status'] == 1){
+                        $status_name = "Published";
+                    } else {
+                        $status_name = "Unpublished";
+                    }
+                    return $status_name;
+                },
+
+            ],
+            'created_at:datetime',
+            'updated_at:datetime',
+            'published',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
+
 
 </div>

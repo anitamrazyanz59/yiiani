@@ -10,11 +10,12 @@ use backend\models\NewsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * NewsController implements the CRUD actions for News model.
  */
-class NewsController extends Controller
+class NewsController extends AdminController
 {
     /**
      * @inheritdoc
@@ -38,8 +39,8 @@ class NewsController extends Controller
     public function actionIndex()
     {
         $searchModel = new NewsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -68,7 +69,11 @@ class NewsController extends Controller
     {
         $model = new News();
 
+
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            $model->upload();
             $news_category = $_POST['News']['categories'];
             if($news_category) {
                 foreach($news_category as $cat_id) {
@@ -101,11 +106,15 @@ class NewsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $news_categorys = $_POST['News']['categories'];
+        //if($_POST){print_r($_POST); die;}
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->published = date('Y-m-d H:i:s', strtotime($model->published));
+            $model->upload();
+            $model->save();
+            $news_categories = $_POST['News']['categories'];
             NewsCategory::deleteAll(['news_id' => $model->id]);
-            if($news_categorys) {
-                foreach($news_categorys as $cat_id) {
+            if($news_categories) {
+                foreach($news_categories as $cat_id) {
                     $news_category = new NewsCategory();
                     $news_category->news_id = $model->id;
                     $news_category->category_id = $cat_id;
@@ -137,7 +146,7 @@ class NewsController extends Controller
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
-
+        unlink(Yii::getAlias('@frontend') .'/web/uploads/'.$id.'.jpg');
         return $this->redirect(['index']);
     }
 

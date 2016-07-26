@@ -30,11 +30,17 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'title',
-            'text:ntext',
-            'status',
+            'text:html',
+            [
+                'attribute' => 'status',
+                'value' => $model->status == 1 ? "Published": "Unpublished",
+                //or: 'value' => $model->some_attribute != null ? Html::encode($model->some_attribute) : '',
+            ],
             'created_at',
             'updated_at',
+
         ],
+
     ]) ?>
 
 </div>

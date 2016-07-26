@@ -109,3 +109,11 @@ a.desc:after {
 .nav > li > form > button:hover {
     text-decoration: none;
 }
+.categories_list label{
+    display: block;
+
+}
+.update_img{
+    height: 150px;
+    width: 200px;
+}
